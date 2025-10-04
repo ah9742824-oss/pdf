@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 إدارة المواد ورفع الصور</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .add-subject {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .add-subject input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 60%;
+      margin-left: 10px;
+    }
+    .add-subject button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .add-subject button:hover {
+      background-color: #45a049;
+    }
+    .subject {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #fafafa;
+    }
+    .subject h2 {
+      margin-top: 0;
+      color: #444;
+    }
+    .subject button {
+      margin-top: 5px;
+      margin-right: 5px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .subject button:hover {
+      opacity: 0.8;
+    }
+    .btn-convert { background: #2196F3; color: white; }
+    .btn-open { background: #FF9800; color: white; }
+    .btn-edit { background: #9C27B0; color: white; }
+    .btn-delete { background: #f44336; color: white; }
+    .actions {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #downloadAllBtn {
+      background: #607D8B;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #downloadAllBtn:hover {
+      background: #546E7A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📖 إدارة المواد</h1>
+
+    <div class="add-subject">
+      <input type="text" id="subjectName" placeholder="اكتب اسم المادة...">
+      <button id="addSubjectBtn">➕ إضافة مادة</button>
+    </div>
+
+    <div id="subjectsContainer"></div>
+
+    <div class="actions">
+      <button id="downloadAllBtn">⬇️ تحميل كل ملفات PDF</button>
+    </div>
+  </div>
+
+  <!-- مكتبة jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    const addSubjectBtn = document.getElementById('addSubjectBtn');
+    const subjectNameInput = document.getElementById('subjectName');
+    const subjectsContainer = document.getElementById('subjectsContainer');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+
+    let subjects = JSON.parse(localStorage.getItem('subjects')) || [];
+
+    // حفظ في localStorage
+    function saveSubjects() {
+      localStorage.setItem('subjects', JSON.stringify(subjects));
+    }
+
+    // عرض المواد
+    function renderSubjects() {
+      subjectsContainer.innerHTML = '';
+      subjects.forEach((subj, index) => {
+        const div = document.createElement('div');
+        div.className = 'subject';
+        div.innerHTML = `
+          <h2>${subj.name}</h2>
+          <input type="file" id="fileInput-${index}" accept="image/*" multiple>
+          <button class="btn-convert" onclick="convertToPDF(${index})">📄 تحويل إلى PDF</button>
+          ${
+            subj.pdf
+              ? `
+                <p>📎 تم حفظ الملف: ${subj.pdfName}</p>
+                <button class="btn-open" onclick="openPDF(${index})">📖 فتح الملف</button>
+                <button class="btn-edit" onclick="editPDF(${index})">✏️ تعديل الملف</button>
+                <button class="btn-delete" onclick="deleteSubject(${index})">🗑 حذف المادة</button>
+              `
+              : ''
+          }
+        `;
+        subjectsContainer.appendChild(div);
+      });
+    }
+
+    // إضافة مادة جديدة
+    addSubjectBtn.addEventListener('click', () => {
+      const name = subjectNameInput.value.trim();
+      if (name === '') return alert('من فضلك اكتب اسم المادة');
+      subjects.push({ name, pdf: null, pdfName: '' });
+      saveSubjects();
+      renderSubjects();
+      subjectNameInput.value = '';
+    });
+
+    // 🔥 تحويل الصور إلى PDF
+    window.convertToPDF = (index) => {
+      const input = document.getElementById(`fileInput-${index}`);
+      if (!input.files.length) return alert("📌 اختار صور الأول");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let count = 0;
+
+      Array.from(input.files).forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const imgWidth = 210;   // عرض A4 بالمللي
+            const imgHeight = (img.height * imgWidth) / img.width;
+            if (i > 0) pdf.addPage();
+            pdf.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
+
+            count++;
+            if (count === input.files.length) {
+              const pdfName = `${subjects[index].name}.pdf`;
+              const pdfData = pdf.output("datauristring");
+              subjects[index].pdf = pdfData;
+              subjects[index].pdfName = pdfName;
+              saveSubjects();
+              renderSubjects();
+              alert(`✅ تم حفظ ملف ${pdfName} داخل المادة`);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    // فتح PDF
+    window.openPDF = (index) => {
+      const subj = subjects[index];
+      if (!subj.pdf) return alert('لا يوجد ملف محفوظ بعد');
+      const win = window.open();
+      win.document.write(`
+        <title>${subj.pdfName}</title>
+        <iframe src="${subj.pdf}" width="100%" height="100%" style="border:none;"></iframe>
+      `);
+    };
+
+    // ✏️ تعديل PDF (إعادة رفع صور)
+    window.editPDF = (index) => {
+      alert("📌 ارفع صور جديدة ليتم استبدال الملف القديم");
+      const input = document.getElementById(`fileInput-${index}`);
+      input.click(); 
+      input.onchange = () => convertToPDF(index);
+    };
+
+    // 🗑 حذف مادة
+    window.deleteSubject = (index) => {
+      if (confirm("هل أنت متأكد من حذف هذه المادة؟")) {
+        subjects.splice(index, 1);
+        saveSubjects();
+        renderSubjects();
+      }
+    };
+
+    // تحميل كل الملفات
+    downloadAllBtn.addEventListener('click', () => {
+      subjects.forEach(subj => {
+        if (subj.pdf) {
+          const a = document.createElement('a');
+          a.href = subj.pdf;
+          a.download = subj.pdfName;
+          a.click();
+        }
+      });
+    });
+
+    // أول تشغيل
+    renderSubjects();
+  </script>
+</body>
+</html>
