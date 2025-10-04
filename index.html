@@ -1,246 +1,278 @@
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
+  <title>📚 مكتبتي التعليمية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 إدارة المواد ورفع الصور</title>
+  <!-- مكتبات -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <style>
     body {
       font-family: "Cairo", sans-serif;
-      background-color: #f5f7fa;
       margin: 0;
-      padding: 0;
+      background: #f3f4f6;
+      color: #333;
+      transition: 0.3s;
       direction: rtl;
     }
-    .container {
-      width: 90%;
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    body.dark { background: #111827; color: #e5e7eb; }
+    header {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white; padding: 20px;
+      text-align: center; font-size: 22px;
+      font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      display: flex; justify-content: space-between; align-items: center;
     }
-    h1 {
-      text-align: center;
-      color: #333;
+    .toggle-btn {
+      background: white; color: #4f46e5; border: none;
+      border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 14px;
     }
-    .add-subject {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
+    body.dark .toggle-btn { background: #1f2937; color: #f3f4f6; }
+    main { max-width: 900px; margin: 30px auto; padding: 0 15px; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    input, button {
+      padding: 10px 15px; border-radius: 8px; border: none; font-size: 14px;
     }
-    .add-subject input {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 60%;
-      margin-left: 10px;
-    }
-    .add-subject button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
+    input { flex: 1; border: 1px solid #ddd; }
+    button { cursor: pointer; background: #4f46e5; color: white; transition: 0.2s; }
+    button:hover { background: #3730a3; }
+    .subject-card {
+      background: white; border-radius: 12px; padding: 20px;
+      margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: 0.3s;
     }
-    .add-subject button:hover {
-      background-color: #45a049;
-    }
-    .subject {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      background: #fafafa;
-    }
-    .subject h2 {
-      margin-top: 0;
-      color: #444;
-    }
-    .subject button {
-      margin-top: 5px;
-      margin-right: 5px;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .subject button:hover {
-      opacity: 0.8;
-    }
-    .btn-convert { background: #2196F3; color: white; }
-    .btn-open { background: #FF9800; color: white; }
-    .btn-edit { background: #9C27B0; color: white; }
-    .btn-delete { background: #f44336; color: white; }
-    .actions {
-      text-align: center;
-      margin-top: 20px;
-    }
-    #downloadAllBtn {
-      background: #607D8B;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    #downloadAllBtn:hover {
-      background: #546E7A;
-    }
+    body.dark .subject-card { background: #1f2937; color: #f9fafb; }
+    .subject-card h3 { margin: 0 0 10px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button { flex: 1; }
+    .file-input { margin: 10px 0; }
+    .download-all { margin: 20px 0; text-align: center; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📖 إدارة المواد</h1>
-
-    <div class="add-subject">
-      <input type="text" id="subjectName" placeholder="اكتب اسم المادة...">
-      <button id="addSubjectBtn">➕ إضافة مادة</button>
+  <header>
+    📚 مكتبتي التعليمية
+    <button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </header>
+  <main>
+    <div class="controls">
+      <input type="text" id="subjectName" placeholder="اسم المادة...">
+      <button onclick="addSubject()">➕ إضافة</button>
     </div>
-
-    <div id="subjectsContainer"></div>
-
-    <div class="actions">
-      <button id="downloadAllBtn">⬇️ تحميل كل ملفات PDF</button>
+    <div id="subjects"></div>
+    <div class="download-all">
+      <button onclick="downloadAll()">⬇️ تحميل كل الملفات ZIP</button>
     </div>
-  </div>
+  </main>
 
-  <!-- مكتبة jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const { jsPDF } = window.jspdf;
 
-    const addSubjectBtn = document.getElementById('addSubjectBtn');
-    const subjectNameInput = document.getElementById('subjectName');
-    const subjectsContainer = document.getElementById('subjectsContainer');
-    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    // ===== IndexedDB إعداد =====
+    let db;
+    const request = indexedDB.open("MyLibrary", 1);
+    request.onupgradeneeded = e => {
+      db = e.target.result;
+      db.createObjectStore("subjects", { keyPath: "id", autoIncrement: true });
+    };
+    request.onsuccess = e => { db = e.target.result; renderSubjects(); };
 
-    let subjects = JSON.parse(localStorage.getItem('subjects')) || [];
-
-    // حفظ في localStorage
-    function saveSubjects() {
-      localStorage.setItem('subjects', JSON.stringify(subjects));
+    // ===== إضافة مادة =====
+    function addSubject() {
+      const name = document.getElementById("subjectName").value.trim();
+      if (!name) return alert("⚠️ اكتب اسم المادة");
+      const tx = db.transaction("subjects", "readwrite");
+      tx.objectStore("subjects").add({ name, pdf: null, pdfName: null });
+      tx.oncomplete = renderSubjects;
+      document.getElementById("subjectName").value = "";
     }
 
-    // عرض المواد
+    // ===== رسم المواد =====
     function renderSubjects() {
-      subjectsContainer.innerHTML = '';
-      subjects.forEach((subj, index) => {
-        const div = document.createElement('div');
-        div.className = 'subject';
-        div.innerHTML = `
-          <h2>${subj.name}</h2>
-          <input type="file" id="fileInput-${index}" accept="image/*" multiple>
-          <button class="btn-convert" onclick="convertToPDF(${index})">📄 تحويل إلى PDF</button>
-          ${
-            subj.pdf
-              ? `
-                <p>📎 تم حفظ الملف: ${subj.pdfName}</p>
-                <button class="btn-open" onclick="openPDF(${index})">📖 فتح الملف</button>
-                <button class="btn-edit" onclick="editPDF(${index})">✏️ تعديل الملف</button>
-                <button class="btn-delete" onclick="deleteSubject(${index})">🗑 حذف المادة</button>
-              `
-              : ''
-          }
-        `;
-        subjectsContainer.appendChild(div);
-      });
+      const tx = db.transaction("subjects", "readonly");
+      const store = tx.objectStore("subjects");
+      store.getAll().onsuccess = e => {
+        const subjects = e.target.result;
+        const container = document.getElementById("subjects");
+        container.innerHTML = "";
+        subjects.forEach(subj => {
+          const div = document.createElement("div");
+          div.className = "subject-card";
+          div.innerHTML = `
+            <h3>${subj.name}</h3>
+            <div class="file-input">
+              <input type="file" id="fileInput-${subj.id}" multiple accept="image/*">
+            </div>
+            <div class="actions">
+              <button onclick="convertToPDF(${subj.id})">📄 تحويل لملف PDF</button>
+              <button onclick="openPDF(${subj.id})">📖 فتح الملف</button>
+              <button onclick="downloadPDF(${subj.id})">⬇️ تحميل الملف</button>
+              <button onclick="editSubject(${subj.id})">✏️ تعديل</button>
+              <button onclick="addToPDF(${subj.id})">➕ إضافة للملف</button>
+              <button onclick="deleteSubject(${subj.id})" style="background:#dc2626">🗑️ حذف</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      };
     }
 
-    // إضافة مادة جديدة
-    addSubjectBtn.addEventListener('click', () => {
-      const name = subjectNameInput.value.trim();
-      if (name === '') return alert('من فضلك اكتب اسم المادة');
-      subjects.push({ name, pdf: null, pdfName: '' });
-      saveSubjects();
-      renderSubjects();
-      subjectNameInput.value = '';
-    });
+    // ===== حذف مادة =====
+    function deleteSubject(id) {
+      if (!confirm("هل انت متأكد من الحذف؟")) return;
+      const tx = db.transaction("subjects", "readwrite");
+      tx.objectStore("subjects").delete(id);
+      tx.oncomplete = renderSubjects;
+    }
 
-    // 🔥 تحويل الصور إلى PDF
-    window.convertToPDF = (index) => {
-      const input = document.getElementById(`fileInput-${index}`);
+    // ===== تعديل اسم المادة =====
+    function editSubject(id) {
+      const newName = prompt("اكتب الاسم الجديد:");
+      if (!newName) return;
+      const tx = db.transaction("subjects", "readwrite");
+      const store = tx.objectStore("subjects");
+      store.get(id).onsuccess = e => {
+        const subj = e.target.result;
+        subj.name = newName;
+        store.put(subj);
+        tx.oncomplete = renderSubjects;
+      };
+    }
+
+    // ===== تحويل صور إلى PDF =====
+    function convertToPDF(id) {
+      const input = document.getElementById(`fileInput-${id}`);
       if (!input.files.length) return alert("📌 اختار صور الأول");
 
       const pdf = new jsPDF("p", "mm", "a4");
       let count = 0;
-
       Array.from(input.files).forEach((file, i) => {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = e => {
           const img = new Image();
-          img.onload = function() {
-            const imgWidth = 210;   // عرض A4 بالمللي
+          img.onload = () => {
+            const imgWidth = 210;
             const imgHeight = (img.height * imgWidth) / img.width;
             if (i > 0) pdf.addPage();
             pdf.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
 
             count++;
             if (count === input.files.length) {
-              const pdfName = `${subjects[index].name}.pdf`;
               const pdfData = pdf.output("datauristring");
-              subjects[index].pdf = pdfData;
-              subjects[index].pdfName = pdfName;
-              saveSubjects();
-              renderSubjects();
-              alert(`✅ تم حفظ ملف ${pdfName} داخل المادة`);
+              const tx = db.transaction("subjects", "readwrite");
+              const store = tx.objectStore("subjects");
+              store.get(id).onsuccess = ev => {
+                const subj = ev.target.result;
+                subj.pdf = pdfData;
+                subj.pdfName = `${subj.name}.pdf`;
+                store.put(subj);
+                tx.oncomplete = () => { renderSubjects(); alert("✅ تم حفظ الملف"); };
+              };
             }
           };
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
       });
-    };
+    }
 
-    // فتح PDF
-    window.openPDF = (index) => {
-      const subj = subjects[index];
-      if (!subj.pdf) return alert('لا يوجد ملف محفوظ بعد');
-      const win = window.open();
-      win.document.write(`
-        <title>${subj.pdfName}</title>
-        <iframe src="${subj.pdf}" width="100%" height="100%" style="border:none;"></iframe>
-      `);
-    };
+    // ===== إضافة صور لملف موجود =====
+    function addToPDF(id) {
+      const input = document.createElement("input");
+      input.type = "file"; input.accept = "image/*"; input.multiple = true;
+      input.onchange = () => {
+        const tx = db.transaction("subjects", "readwrite");
+        const store = tx.objectStore("subjects");
+        store.get(id).onsuccess = e => {
+          const subj = e.target.result;
+          if (!subj.pdf) return alert("📌 مفيش ملف محفوظ للمادة دي");
 
-    // ✏️ تعديل PDF (إعادة رفع صور)
-    window.editPDF = (index) => {
-      alert("📌 ارفع صور جديدة ليتم استبدال الملف القديم");
-      const input = document.getElementById(`fileInput-${index}`);
-      input.click(); 
-      input.onchange = () => convertToPDF(index);
-    };
+          const pdf = new jsPDF("p", "mm", "a4");
+          pdf.addFileToVFS("old.pdf", subj.pdf); // placeholder
 
-    // 🗑 حذف مادة
-    window.deleteSubject = (index) => {
-      if (confirm("هل أنت متأكد من حذف هذه المادة؟")) {
-        subjects.splice(index, 1);
-        saveSubjects();
-        renderSubjects();
-      }
-    };
+          // نبدأ من الصفر (لأن jsPDF مش بيعدل مباشرة على dataURI)
+          const reader = new FileReader();
+          let newPDF = new jsPDF("p", "mm", "a4");
+          Array.from(input.files).forEach((file, i) => {
+            const r = new FileReader();
+            r.onload = e2 => {
+              const img = new Image();
+              img.onload = () => {
+                const imgWidth = 210;
+                const imgHeight = (img.height * imgWidth) / img.width;
+                if (i > 0) newPDF.addPage();
+                newPDF.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
 
-    // تحميل كل الملفات
-    downloadAllBtn.addEventListener('click', () => {
-      subjects.forEach(subj => {
-        if (subj.pdf) {
-          const a = document.createElement('a');
-          a.href = subj.pdf;
-          a.download = subj.pdfName;
-          a.click();
-        }
-      });
+                if (i === input.files.length - 1) {
+                  subj.pdf = newPDF.output("datauristring");
+                  subj.pdfName = `${subj.name}.pdf`;
+                  store.put(subj);
+                  tx.oncomplete = () => { renderSubjects(); alert("✅ تم تحديث الملف"); };
+                }
+              };
+              img.src = e2.target.result;
+            };
+            r.readAsDataURL(file);
+          });
+        };
+      };
+      input.click();
+    }
+
+    // ===== فتح ملف =====
+    function openPDF(id) {
+      const tx = db.transaction("subjects", "readonly");
+      const store = tx.objectStore("subjects");
+      store.get(id).onsuccess = e => {
+        const subj = e.target.result;
+        if (!subj.pdf) return alert("📌 مفيش ملف محفوظ");
+        const pdfWindow = window.open();
+        pdfWindow.document.write(`<iframe width='100%' height='100%' src='${subj.pdf}'></iframe>`);
+      };
+    }
+
+    // ===== تحميل ملف =====
+    function downloadPDF(id) {
+      const tx = db.transaction("subjects", "readonly");
+      const store = tx.objectStore("subjects");
+      store.get(id).onsuccess = e => {
+        const subj = e.target.result;
+        if (!subj.pdf) return alert("📌 مفيش ملف محفوظ");
+        const link = document.createElement("a");
+        link.href = subj.pdf;
+        link.download = subj.pdfName;
+        link.click();
+      };
+    }
+
+    // ===== تحميل كل الملفات كـ ZIP =====
+    function downloadAll() {
+      const tx = db.transaction("subjects", "readonly");
+      tx.objectStore("subjects").getAll().onsuccess = e => {
+        const subjects = e.target.result.filter(s => s.pdf);
+        if (!subjects.length) return alert("📌 مفيش ملفات محفوظة");
+        const zip = new JSZip();
+        subjects.forEach(subj => {
+          const base64Data = subj.pdf.split(",")[1];
+          zip.file(subj.pdfName, base64Data, { base64: true });
+        });
+        zip.generateAsync({ type: "blob" }).then(content => saveAs(content, "كل_الملفات.zip"));
+      };
+    }
+
+    // ===== دارك مود =====
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    // ===== تحذير قبل الإغلاق =====
+    window.addEventListener("beforeunload", e => {
+      e.preventDefault();
+      e.returnValue = "⚠️ انت على وشك الخروج، هل انت متأكد انك عايز تقفل؟";
     });
-
-    // أول تشغيل
-    renderSubjects();
   </script>
 </body>
 </html>
