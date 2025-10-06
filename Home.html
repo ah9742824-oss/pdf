@@ -1,328 +1,343 @@
 
 <!DOCTYPE html>
 <html lang="ar">
-<head> 
-  
-  <link rel="icon" href="favicon.ico" type="image/ico">
-  <meta charset="UTF-8">
-
-  <title>📚 مكتبتي التعليمية</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- مكتبات -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <style>
-    body {
-      font-family: "Cairo", sans-serif;
-      margin: 0;
-      background: #f3f4f6;
-      color: #333;
-      transition: 0.3s;
-      direction: rtl;
-    }
-    body.dark {
-      background: #111827;
-      color: #e5e7eb;
-    }
-    header {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: white;
-      padding: 25px 20px;
-      font-size: 22px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .toggle-btn {
-      background: white;
-      color: #4f46e5;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    body.dark .toggle-btn {
-      background: #1f2937;
-      color: #f3f4f6;
-    }
-    main {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 0 15px;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    input, button {
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-    }
-    input {
-      flex: 1;
-      border: 1px solid #ddd;
-    }
-    button {
-      cursor: pointer;
-      background: #4f46e5;
-      color: white;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #3730a3;
-    }
-    .subject-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: 0.3s;
-    }
-    body.dark .subject-card {
-      background: #1f2937;
-      color: #f9fafb;
-    }
-    .subject-card h3 {
-      margin: 0 0 10px;
-    }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .actions button {
-      flex: 1;
-    }
-    /* زرار اختيار الملف */
-    .file-label {
-      display: inline-block;
-      padding: 10px 15px;
-      background: #6366f1;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-    .file-label:hover {
-      background: #4f46e5;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    .download-all {
-      margin: 20px 0;
-      text-align: center;
-    }
-
-
-
-
-    
-    
-.link-btn {
-  
-  text-align: center;
- 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 مكتبتي التعليمية</title>
+<link rel="icon" href="favicon.ico" type="image/ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+body {
+  font-family: "Cairo", sans-serif;
+  margin: 0;
+  background: #f3f4f6;
+  color: #333;
+  direction: rtl;
+  transition: 0.3s;
 }
-
-.link-btn a {
-  display: inline-block;
+body.dark { background: #111827; color: #e5e7eb; }
+header {
   background: linear-gradient(135deg, #4f46e5, #6366f1);
   color: white;
-  padding: 5px 5px;
+  padding: 25px 20px;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.toggle-btn {
+  background: white;
+  color: #4f46e5;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+body.dark .toggle-btn { background: #1f2937; color: #f3f4f6; }
+main {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 15px;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+input, button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+input { flex: 1; border: 1px solid #ddd; }
+button {
+  cursor: pointer;
+  background: #4f46e5;
+  color: white;
+  transition: 0.2s;
+}
+button:hover { background: #3730a3; }
+.subject-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+body.dark .subject-card { background: #1f2937; color: #f9fafb; }
+.subject-card h3 { margin: 0 0 10px; }
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.actions button { flex: 1; }
+.file-label {
+  display: inline-block;
+  padding: 10px 15px;
+  background: #6366f1;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+input[type="file"] { display: none; }
+.preview-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+.preview-row img {
+  height: 70px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.preview-row img:hover { opacity: 0.7; transform: scale(1.05); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4f46e5;
+  color: white;
+  padding: 12px 18px;
   border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s;
+  z-index: 1000;
+  min-width: 200px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-progress {
+  height: 4px;
+  background: #22c55e;
+  width: 0%;
+  border-radius: 10px;
+  margin-top: 5px;
+  transition: width 0.3s linear;
+}
+.link-btn a {
+  display: inline-block;
+  background: white;
+  color: #4f46e5;
+  padding: 6px 10px;
+  border-radius: 8px;
   text-decoration: none;
-  font-size: 16px;
   font-weight: bold;
   transition: 0.3s;
 }
-
-.link-btn a:hover {
-  background: linear-gradient(135deg, #3730a3, #4f46e5);
-}
-
-
-    
-  </style>
+.link-btn a:hover { background: #e0e7ff; }
+</style>
 </head>
 <body>
-  <header>
-    <span>📚 مكتبتي التعليمية</span>
-
-<div class="link-btn">
-  <a href="https://ah9742824-oss.github.io/my-project/" target="_blank">🌐</a>
-  
+<header>
+  <span>📚 مكتبتي التعليمية</span>
+  <div class="link-btn">
+    <a href="https://ah9742824-oss.github.io/my-project/" target="_blank">🌐</a>
   </div>
-  
-    <button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  <button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+</header>
 
+<main>
+  <div class="controls">
+    <input type="text" id="subjectName" placeholder="اسم المادة...">
+    <button onclick="addSubject()">➕ إضافة</button>
+  </div>
+  <button style="margin-bottom:15px;background:#10b981;" onclick="downloadAll()">📦 تحميل كل الملفات</button>
+  <div id="subjects"></div>
+</main>
 
-  
-  </header>
-  <main>
-    <div class="controls">
-      <input type="text" id="subjectName" placeholder="اسم المادة...">
-      <button onclick="addSubject()">➕ إضافة</button>
-    </div>
-    <div id="subjects"></div>
-    <div class="download-all">
-      <button onclick="downloadAll()">⬇️ تحميل كل الملفات ZIP</button>
-    </div>
-  </main>
+<div id="toast" class="toast">
+  <div id="toast-text"></div>
+  <div id="toast-progress" class="toast-progress"></div>
+</div>
 
-  <script>
-    const { jsPDF } = window.jspdf;
-    let subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+<script>
+const { jsPDF } = window.jspdf;
+let subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
 
-    function saveSubjects() {
-      localStorage.setItem("subjects", JSON.stringify(subjects));
-    }
+function showToast(msg, progress = 0, time = 2000) {
+  const toast = document.getElementById("toast");
+  const text = document.getElementById("toast-text");
+  const bar = document.getElementById("toast-progress");
+  text.innerText = msg;
+  bar.style.width = progress + "%";
+  toast.classList.add("show");
+  if (progress === 100) setTimeout(() => toast.classList.remove("show"), time);
+}
 
-    function renderSubjects() {
-      const container = document.getElementById("subjects");
-      container.innerHTML = "";
-      subjects.forEach((subj, i) => {
-        const div = document.createElement("div");
-        div.className = "subject-card";
-        div.innerHTML = `
-          <h3>${subj.name}</h3>
-          <label class="file-label" for="fileInput-${i}">📂 اختر صور</label>
-          <input type="file" id="fileInput-${i}" multiple accept="image/*">
-          <div class="actions">
-            <button onclick="convertToPDF(${i})">📄 إنشاء/تحديث PDF</button>
-            <button onclick="openPDF(${i})">📖 عرض الملف</button>
-            <button onclick="downloadPDF(${i})">⬇️ تحميل الملف</button>
-            <button onclick="editSubject(${i})">✏️ تعديل اسم</button>
-            <button onclick="deleteSubject(${i})" style="background:#dc2626">🗑️ حذف</button>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
+function saveSubjects() {
+  localStorage.setItem("subjects", JSON.stringify(subjects));
+}
 
-    function addSubject() {
-      const name = document.getElementById("subjectName").value.trim();
-      if (!name) return alert("⚠️ اكتب اسم المادة");
-      subjects.push({ name, pdf: null, pdfName: null });
-      saveSubjects();
-      renderSubjects();
-      document.getElementById("subjectName").value = "";
-    }
+function renderSubjects() {
+  const container = document.getElementById("subjects");
+  container.innerHTML = "";
+  subjects.forEach((subj, i) => {
+    const div = document.createElement("div");
+    div.className = "subject-card";
+    div.innerHTML = `
+      <h3>${subj.name}</h3>
+      <label class="file-label" for="fileInput-${i}">📂 اختر صور</label>
+      <input type="file" id="fileInput-${i}" multiple accept="image/*">
+      <div class="preview-row" id="preview-${i}"></div>
+      <div class="actions">
+        <button onclick="convertToPDF(${i})">📄 إنشاء / تحديث PDF</button>
+        <button onclick="openPDF(${i})">📖 عرض</button>
+        <button onclick="downloadPDF(${i})">⬇️ تحميل</button>
+        <button onclick="sharePDF(${i})">📤 مشاركة</button>
+        <button onclick="editSubject(${i})">✏️ تعديل</button>
+        <button onclick="deleteSubject(${i})" style="background:#dc2626">🗑️ حذف</button>
+      </div>`;
+    container.appendChild(div);
+    div.querySelector(`#fileInput-${i}`).addEventListener("change", (e) => previewImages(e, i));
+  });
+}
 
-    function deleteSubject(i) {
-      if (confirm("هل انت متأكد من الحذف؟")) {
-        subjects.splice(i, 1);
-        saveSubjects();
-        renderSubjects();
-      }
-    }
+function addSubject() {
+  const name = document.getElementById("subjectName").value.trim();
+  if (!name) return showToast("⚠️ اكتب اسم المادة");
+  subjects.push({ name, pdf: null });
+  saveSubjects();
+  renderSubjects();
+  document.getElementById("subjectName").value = "";
+}
 
-    function editSubject(i) {
-      const newName = prompt("اكتب الاسم الجديد:", subjects[i].name);
-      if (newName) {
-        subjects[i].name = newName;
-        saveSubjects();
-        renderSubjects();
-      }
-    }
-
-    window.convertToPDF = (index) => {
-      const input = document.getElementById(`fileInput-${index}`);
-      if (!input.files.length && !subjects[index].pdf) 
-        return alert("📌 اختار صور الأول");
-
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      let files = input.files.length ? Array.from(input.files) : [];
-
-      if (subjects[index].pdf) {
-        alert("📎 سيتم استبدال الملف القديم بالملف الجديد.");
-      }
-
-      let count = 0;
-      files.forEach((file, i) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const imgWidth = 210;
-            const imgHeight = (img.height * imgWidth) / img.width;
-            if (i > 0) pdf.addPage();
-            pdf.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
-
-            count++;
-            if (count === files.length) {
-              const pdfName = `${subjects[index].name}.pdf`;
-              const pdfBlob = pdf.output("blob");
-              const pdfUrl = URL.createObjectURL(pdfBlob);
-              subjects[index].pdf = pdfUrl;
-              subjects[index].pdfName = pdfName;
-              saveSubjects();
-              renderSubjects();
-              alert(`✅ تم حفظ ملف ${pdfName} داخل المادة`);
-            }
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    };
-
-    window.openPDF = (index) => {
-      if (!subjects[index].pdf) return alert("📌 مفيش ملف محفوظ");
-      window.open(subjects[index].pdf, "_blank");
-    };
-
-    window.downloadPDF = (index) => {
-      if (!subjects[index].pdf) return alert("📌 مفيش ملف محفوظ");
-      const link = document.createElement("a");
-      link.href = subjects[index].pdf;
-      link.download = subjects[index].pdfName;
-      link.click();
-    };
-
-    function downloadAll() {
-      const zip = new JSZip();
-      let count = 0;
-      const total = subjects.filter(s => s.pdf).length;
-
-      if (total === 0) return alert("📌 مفيش ملفات محفوظة للتحميل");
-
-      subjects.forEach(subj => {
-        if (subj.pdf) {
-          fetch(subj.pdf).then(res => res.blob()).then(blob => {
-            zip.file(subj.pdfName, blob);
-            count++;
-            if (count === total) {
-              zip.generateAsync({ type: "blob" }).then(content => {
-                saveAs(content, "كل_الملفات.zip");
-              });
-            }
-          });
-        }
-      });
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-    }
-
+function deleteSubject(i) {
+  if (confirm("هل أنت متأكد من الحذف؟")) {
+    subjects.splice(i, 1);
+    saveSubjects();
     renderSubjects();
+  }
+}
 
-    // تحذير قبل الإغلاق
-    window.addEventListener("beforeunload", function (e) {
-      e.preventDefault();
-      e.returnValue = "⚠️ انت على وشك الخروج، هل متأكد انك عايز تقفل؟";
+function editSubject(i) {
+  const newName = prompt("اكتب الاسم الجديد:", subjects[i].name);
+  if (newName) {
+    subjects[i].name = newName;
+    saveSubjects();
+    renderSubjects();
+  }
+}
+
+function previewImages(e, index) {
+  const container = document.getElementById(`preview-${index}`);
+  container.innerHTML = "";
+  Array.from(e.target.files).forEach((file) => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.title = "اضغط للحذف";
+    img.onclick = () => img.remove();
+    container.appendChild(img);
+  });
+}
+
+async function convertToPDF(index) {
+  const input = document.getElementById(`fileInput-${index}`);
+  if (!input.files.length) return showToast("📌 اختر صور أولاً");
+  const pdf = new jsPDF("p", "mm", "a4");
+  const files = Array.from(input.files);
+  for (let i = 0; i < files.length; i++) {
+    const progress = Math.round(((i + 1) / files.length) * 100);
+    showToast(`📄 تحويل الصورة ${i + 1} من ${files.length}`, progress);
+    const imgData = await compressImage(files[i]);
+    const img = new Image();
+    await new Promise((res) => {
+      img.onload = () => {
+        const imgWidth = 210;
+        const imgHeight = (img.height * imgWidth) / img.width;
+        if (i > 0) pdf.addPage();
+        pdf.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
+        res();
+      };
+      img.src = imgData;
     });
-  </script>
+  }
+  const pdfBase64 = pdf.output("datauristring");
+  subjects[index].pdf = pdfBase64;
+  saveSubjects();
+  showToast("✅ تم إنشاء الملف بنجاح", 100, 2500);
+}
+
+function openPDF(index) {
+  if (!subjects[index].pdf) return showToast("📌 مفيش ملف محفوظ");
+  const pdfWindow = window.open();
+  pdfWindow.document.write(`<iframe width='100%' height='100%' src='${subjects[index].pdf}'></iframe>`);
+}
+
+function downloadPDF(index) {
+  if (!subjects[index].pdf) return showToast("📌 مفيش ملف محفوظ");
+  const link = document.createElement("a");
+  link.href = subjects[index].pdf;
+  link.download = `${subjects[index].name}.pdf`;
+  link.click();
+}
+
+async function downloadAll() {
+  const zip = new JSZip();
+  const pdfs = subjects.filter(s => s.pdf);
+  if (!pdfs.length) return showToast("📦 لا يوجد ملفات للتحميل");
+  showToast("📦 جاري تجهيز الملفات...");
+  for (let i = 0; i < pdfs.length; i++) {
+    const pdf = pdfs[i];
+    const blob = await (await fetch(pdf.pdf)).blob();
+    zip.file(`${pdf.name}.pdf`, blob);
+  }
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  saveAs(zipBlob, "All_PDFs.zip");
+  showToast("✅ تم تحميل جميع الملفات", 100);
+}
+
+async function sharePDF(index) {
+  if (!subjects[index].pdf) return showToast("📌 مفيش ملف محفوظ");
+  const blob = await (await fetch(subjects[index].pdf)).blob();
+  const file = new File([blob], `${subjects[index].name}.pdf`, { type: "application/pdf" });
+  if (navigator.share) {
+    await navigator.share({ files: [file], title: subjects[index].name });
+  } else {
+    showToast("❌ المتصفح لا يدعم المشاركة");
+  }
+}
+
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const scale = 0.6;
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+}
+
+renderSubjects();
+</script>
 </body>
 </html>
+
