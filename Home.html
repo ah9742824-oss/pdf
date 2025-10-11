@@ -270,7 +270,7 @@
 
       progressText.textContent = "⏳ جاري التحويل...";
       bar.style.width = "0%";
-      bar.style.background = "#4f46e5";
+      bar.style.background = "#b6f4d9";
 
       files.forEach((file, i) => {
         const reader = new FileReader();
@@ -296,7 +296,7 @@
               saveSubjects();
 
               setTimeout(() => {
-                bar.style.background = "#b6f4d9";
+                bar.style.background = "#1ae37f";
                 progressText.textContent = `✅ تم إنشاء الملف (${pdfName}) بنجاح`;
                 bar.style.width = "100%";
               }, 400);
