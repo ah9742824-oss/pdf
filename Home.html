@@ -1,478 +1,148 @@
+
+
 <!DOCTYPE html>
 <html lang="ar">
-<head> 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 مكتبتي التعليمية</title>
-  <link rel="icon" href="favicon.ico" type="image/ico">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 مكتبتي التعليمية</title>
+<link rel="icon" href="favicon.ico" type="image/ico">
 
-  <!-- مكتبات -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-  <style>
-    body {
-      font-family: "Cairo", sans-serif;
-      margin: 0;
-      background: #f3f4f6;
-      color: #333;
-      direction: rtl;
-      transition: 0.3s;
-    }
-    body.dark {
-      background: #111827;
-      color: #e5e7eb;
-    }
-    header {
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: white;
-      padding: 25px 20px;
-      font-size: 22px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .toggle-btn {
-      background: white;
-      color: #4f46e5;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    body.dark .toggle-btn {
-      background: #1f2937;
-      color: #f3f4f6;
-    }
-    main {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 0 15px;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    input, button {
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-    }
-    input {
-      flex: 1;
-      border: 1px solid #ddd;
-    }
-    button {
-      cursor: pointer;
-      background: #4f46e5;
-      color: white;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #3730a3;
-    }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .subject-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: 0.3s;
-    }
-    body.dark .subject-card {
-      background: #1f2937;
-      color: #f9fafb;
-    }
-    .subject-card h3 {
-      margin: 0 0 10px;
-    }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .actions button {
-      flex: 1;
-      min-width: 120px;
-    }
-    .file-label {
-      display: inline-block;
-      padding: 10px 15px;
-      background: #6366f1;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-    .file-label:hover {
-      background: #4f46e5;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    .download-all {
-      margin: 20px 0;
-      text-align: center;
-    }
-    .link-btn {
-      text-align: center;
-    }
-    .link-btn a {
-      display: inline-block;
-      background: linear-gradient(135deg, #4f46e5, #6366f1);
-      color: white;
-      padding: 5px 5px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .link-btn a:hover {
-      background: linear-gradient(135deg, #3730a3, #4f46e5);
-    }
-    .progress-bar {
-      height: 8px;
-      width: 0%;
-      background: #4f46e5;
-      border-radius: 4px;
-      transition: width 0.3s;
-    }
-    .preview-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .preview-container img {
-      max-width: 100px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      cursor: move;
-    }
-    .preview-container img.dragging {
-      opacity: 0.5;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      color: #0e7653;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      margin-top: 50px;
-    }
-    @media (max-width: 600px) {
-      .actions {
-        flex-direction: column;
-      }
-      .actions button {
-        min-width: 100%;
-      }
-      .controls {
-        flex-direction: column;
-      }
-      input, button {
-        width: 100%;
-      }
-      .preview-container img {
-        max-width: 80px;
-      }
-    }
-  </style>
+<style>
+body { font-family:"Cairo",sans-serif; margin:0; background:#f3f4f6; color:#333; direction:rtl; transition:.3s;}
+body.dark{background:#111827;color:#e5e7eb;}
+header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;padding:25px 20px;font-size:22px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+.toggle-btn{background:white;color:#4f46e5;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;margin-top:5px;}
+body.dark .toggle-btn{background:#1f2937;color:#f3f4f6;}
+main{max-width:900px;margin:30px auto;padding:0 15px;}
+.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+input,button{padding:10px 15px;border-radius:8px;border:none;font-size:14px;}
+input{flex:1;border:1px solid #ddd;}
+button{cursor:pointer;background:#4f46e5;color:white;transition:.2s;}
+button:hover{background:#3730a3;}
+button:disabled{background:#ccc;cursor:not-allowed;}
+.subject-card{background:white;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:.3s;}
+body.dark .subject-card{background:#1f2937;color:#f9fafb;}
+.subject-card h3{margin:0 0 10px;}
+.actions{display:flex;gap:8px;flex-wrap:wrap;}
+.actions button{flex:1;min-width:120px;}
+.file-label{display:inline-block;padding:10px 15px;background:#6366f1;color:white;border-radius:8px;cursor:pointer;font-size:14px;transition:.2s;}
+.file-label:hover{background:#4f46e5;}
+input[type="file"]{display:none;}
+.download-all{margin:20px 0;text-align:center;}
+.progress-bar{height:8px;width:0%;background:#4f46e5;border-radius:4px;transition:width .3s;}
+.preview-container{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.preview-container img{max-width:100px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);cursor:move;}
+.preview-container img.dragging{opacity:.5;}
+footer{text-align:center;padding:15px;color:#0e7653;font-family:Arial,sans-serif;font-size:14px;margin-top:50px;}
+.link-btn a{display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;padding:5px 5px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:bold;transition:.3s;}
+.link-btn a:hover{background:linear-gradient(135deg,#3730a3,#4f46e5);}
+@media(max-width:600px){.actions{flex-direction:column}.actions button{min-width:100%}.controls{flex-direction:column} input,button{width:100%}.preview-container img{max-width:80px}}
+</style>
 </head>
-
 <body>
-  <header>
-    <span>📚 مكتبتي التعليمية</span>
-    <div class="link-btn">
-      <a href="https://ah9742824-oss.github.io/my-project/" target="_blank" title="زيارة المشروع">🌐</a>
-    </div>
-    <button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
-  </header>
+<header>
+<span>📚 مكتبتي التعليمية</span>
+<div class="link-btn">
+  <a href="https://ah9742824-oss.github.io/my-project/" target="_blank" title="زيارة المشروع">🌐</a>
+</div>
+<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+</header>
 
-  <main>
-    <div class="controls">
-      <input type="text" id="subjectName" placeholder="اسم المادة...">
-      <button onclick="addSubject()">➕ إضافة</button>
-    </div>
-    <div id="subjects"></div>
-    <div class="download-all">
-      <button onclick="downloadAll()">⬇️ تحميل كل الملفات ZIP</button>
-    </div>
-  </main>
+<main>
+<div class="controls">
+<input type="text" id="subjectName" placeholder="اسم المادة...">
+<button onclick="addSubject()">➕ إضافة</button>
+</div>
+<div id="subjects"></div>
+</main>
 
-  <footer>
-    Designed & Developed by: Ahmed Hany Sayed Ahmed Abdel Wahab &copy; 2025
-  </footer>
+<footer>
+Designed & Developed by: Ahmed Hany Sayed Ahmed Abdel Wahab &copy; 2025
+</footer>
 
-  <script>
-    const { jsPDF } = window.jspdf;
-    let subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+<script>
+const { jsPDF } = window.jspdf;
+let subjects = JSON.parse(localStorage.getItem("subjects")||"[]");
 
-    function showToast(message, type = "info") {
-      Toastify({
-        text: message,
-        duration: 3000,
-        gravity: "top",
-        position: "center",
-        backgroundColor: type === "error" ? "#dc2626" : "#4f46e5",
-      }).showToast();
-    }
+// =======================================
+// دالة الإشعارات الجميلة
+function showToast(msg,type="info"){
+  let icon = "";
+  let bg = "#4f46e5";
+  if(type==="error"){ icon="⚠️ "; bg="#dc2626"; }
+  else if(type==="success"){ icon="✅ "; bg="#0e7653"; }
+  Toastify({
+    text: icon + msg,
+    duration:3000,
+    gravity:"top",
+    position:"center",
+    backgroundColor:bg,
+    stopOnFocus:true
+  }).showToast();
+}
+// =======================================
 
-    function saveSubjects() {
-      localStorage.setItem("subjects", JSON.stringify(subjects));
-    }
+function saveSubjects(){localStorage.setItem("subjects",JSON.stringify(subjects));}
+function toggleDarkMode(){document.body.classList.toggle("dark");}
 
-    function renderSubjects() {
-      const container = document.getElementById("subjects");
-      container.innerHTML = "";
-      subjects.forEach((subj, i) => {
-        const div = document.createElement("div");
-        div.className = "subject-card";
-        div.innerHTML = `
-          <h3>${subj.name}</h3>
-          <label class="file-label" for="fileInput-${i}">📂 اختر صور</label>
-          <input type="file" id="fileInput-${i}" multiple>
-          <p id="fileCount-${i}" style="margin:8px 0;color:#666;font-size:14px;">🖼️ لم يتم اختيار صور بعد</p>
-          <div class="preview-container" id="preview-${i}"></div>
-          <p id="progress-${i}" style="margin:8px 0;color:#555;font-size:14px;"></p>
-          <div class="progress-bar" id="bar-${i}"></div>
-          <div class="actions">
-            <button id="convertBtn-${i}" onclick="convertToPDF(${i})">📄 إنشاء/تحديث PDF</button>
-            <button id="openBtn-${i}" onclick="openPDF(${i})" ${!subj.pdf ? 'disabled' : ''}>📖 عرض الملف</button>
-            <button id="downloadBtn-${i}" onclick="downloadPDF(${i})" ${!subj.pdf ? 'disabled' : ''}>⬇️ تحميل الملف</button>
-            <button onclick="editSubject(${i})">✏️ تعديل اسم</button>
-            <button onclick="deleteSubject(${i})" style="background:#dc2626">🗑️ حذف</button>
-          </div>
-        `;
-        container.appendChild(div);
+function addSubject(){
+  const name=document.getElementById("subjectName").value.trim();
+  if(!name){showToast("اكتب اسم المادة","error");return;}
+  subjects.push({name,images:[],pdf:null});
+  saveSubjects(); renderSubjects();
+  document.getElementById("subjectName").value="";
+  showToast("تم إضافة المادة بنجاح","success");
+}
 
-        const fileInput = document.getElementById(`fileInput-${i}`);
-        const fileCount = document.getElementById(`fileCount-${i}`);
-        const previewContainer = document.getElementById(`preview-${i}`);
-        let imageOrder = [];
+function deleteSubject(i){if(confirm("هل أنت متأكد؟")){subjects.splice(i,1);saveSubjects();renderSubjects();showToast("تم الحذف","success");}}
+function editSubject(i){const n=prompt("اكتب الاسم الجديد:",subjects[i].name);if(n){subjects[i].name=n;saveSubjects();renderSubjects();showToast("تم تعديل الاسم","success");}}
 
-        fileInput.addEventListener("change", () => {
-          const files = Array.from(fileInput.files);
-          const count = files.length;
-          fileCount.textContent = count ? `🖼️ عدد الصور: ${count}` : "🖼️ لم يتم اختيار صور بعد";
-          
-          previewContainer.innerHTML = "";
-          imageOrder = files.slice(); // تخزين ترتيب الصور الأصلي
+function renderSubjects(){
+  const container=document.getElementById("subjects"); container.innerHTML="";
+  subjects.forEach((subj,i)=>{
+    const div=document.createElement("div"); div.className="subject-card";
+    div.innerHTML=`
+<h3>${subj.name}</h3>
+<label class="file-label" for="fileInput-${i}">📂 اختر صور</label>
+<input type="file" id="fileInput-${i}" multiple>
+<p id="fileCount-${i}" style="margin:8px 0;color:#666;font-size:14px;">${subj.images.length?"🖼️ عدد الصور: "+subj.images.length:"🖼️ لم يتم اختيار صور بعد"}</p>
+<div class="preview-container" id="preview-${i}"></div>
+<p id="progress-${i}" style="margin:8px 0;color:#555;font-size:14px;"></p>
+<div class="progress-bar" id="bar-${i}"></div>
+<div class="actions">
+<button id="convertBtn-${i}" onclick="convertToPDF(${i})">📄 إنشاء/تحديث PDF</button>
+<button id="previewBtn-${i}" onclick="previewPDF(${i})" ${!subj.pdf?'disabled':''}>👀 معاينة PDF</button>
+<button id="downloadBtn-${i}" onclick="downloadPDF(${i})" ${!subj.pdf?'disabled':''}>⬇️ تحميل PDF</button>
+<button onclick="editSubject(${i})">✏️ تعديل اسم</button>
+<button onclick="deleteSubject(${i})" style="background:#dc2626">🗑️ حذف</button>
+</div>`; container.appendChild(div);
 
-          files.forEach(file => {
-            if (!file.type.startsWith("image/")) {
-              showToast(`⚠️ الملف ${file.name} غير مدعوم`, "error");
-              return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              const img = document.createElement("img");
-              img.src = e.target.result;
-              img.dataset.name = file.name; // لتتبع الملف
-              previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-          });
+    const input=document.getElementById(`fileInput-${i}`);
+    const preview=document.getElementById(`preview-${i}`);
+    const fileCount=document.getElementById(`fileCount-${i}`);
+    subj.images=subj.images||[];
 
-          // تفعيل السحب والإفلات
-          new Sortable(previewContainer, {
-            animation: 150,
-            ghostClass: 'dragging',
-            onEnd: function(evt) {
-              const items = Array.from(previewContainer.children);
-              imageOrder = items.map(img => files.find(file => file.name === img.dataset.name));
-            }
-          });
-        });
+    // عرض الصور الحالية
+    preview.innerHTML=""; subj.images.forEach(im=>{const img=document.createElement("img");img.src=im.url;preview.appendChild(img);});
+    new Sortable(preview,{animation:150,ghostClass:'dragging',onEnd:function(){const order=Array.from(preview.children).map(img=>subj.images.find(im=>im.url===img.src)); subj.images=order; saveSubjects();}});
 
-        // حفظ ترتيب الصور في subjects
-        subjects[i].imageOrder = subjects[i].imageOrder || [];
-        if (subjects[i].imageOrder.length) {
-          fileCount.textContent = `🖼️ عدد الصور: ${subjects[i].imageOrder.length}`;
-          subjects[i].imageOrder.forEach(file => {
-            const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
-            img.dataset.name = file.name;
-            previewContainer.appendChild(img);
-          });
-          new Sortable(previewContainer, {
-            animation: 150,
-            ghostClass: 'dragging',
-            onEnd: function(evt) {
-              const items = Array.from(previewContainer.children);
-              imageOrder = items.map(img => subjects[i].imageOrder.find(file => file.name === img.dataset.name));
-              subjects[i].imageOrder = imageOrder;
-              saveSubjects();
-            }
-          });
-        }
-      });
-    }
-
-    function addSubject() {
-      const name = document.getElementById("subjectName").value.trim();
-      if (!name) return showToast("⚠️ اكتب اسم المادة", "error");
-      subjects.push({ name, pdf: null, pdfName: null, imageOrder: [] });
+    input.addEventListener("change",()=>{
+      const files=Array.from(input.files);
+      subj.images=files.map(f=>({file:f,url:URL.createObjectURL(f)}));
+      fileCount.textContent=files.length?"🖼️ عدد الصور: "+files.length:"🖼️ لم يتم اختيار صور بعد";
+      preview.innerHTML=""; subj.images.forEach(im=>{const img=document.createElement("img");img.src=im.url;preview.appendChild(img);});
       saveSubjects();
-      renderSubjects();
-      document.getElementById("subjectName").value = "";
-      showToast("✅ تم إضافة المادة بنجاح");
-    }
-
-    function deleteSubject(i) {
-      showToast("هل أنت متأكد من الحذف؟", "info");
-      setTimeout(() => {
-        if (confirm("هل أنت متأكد؟")) {
-          subjects.splice(i, 1);
-          saveSubjects();
-          renderSubjects();
-          showToast("🗑️ تم الحذف بنجاح");
-        }
-      }, 500);
-    }
-
-    function editSubject(i) {
-      const newName = prompt("اكتب الاسم الجديد:", subjects[i].name);
-      if (newName) {
-        subjects[i].name = newName;
-        saveSubjects();
-        renderSubjects();
-        showToast("✏️ تم تعديل الاسم بنجاح");
-      }
-    }
-
-    function convertToPDF(index) {
-      const input = document.getElementById(`fileInput-${index}`);
-      const progressText = document.getElementById(`progress-${index}`);
-      const bar = document.getElementById(`bar-${index}`);
-      const convertBtn = document.getElementById(`convertBtn-${index}`);
-      const openBtn = document.getElementById(`openBtn-${index}`);
-      const downloadBtn = document.getElementById(`downloadBtn-${index}`);
-
-      let files = subjects[index].imageOrder.length ? subjects[index].imageOrder : Array.from(input.files);
-      if (!files.length && !subjects[index].pdf) {
-        return showToast("📌 اختر صور أولاً", "error");
-      }
-
-      if (!files.length && subjects[index].pdf) {
-        progressText.textContent = `✅ الملف موجود بالفعل (${subjects[index].pdfName})`;
-        bar.style.width = "100%";
-        bar.style.background = "#1ae37f";
-        return;
-      }
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      let count = 0;
-      const total = files.length;
-
-      progressText.textContent = "⏳ جاري التحويل...";
-      bar.style.width = "0%";
-      bar.style.background = "#b6f4d9";
-
-      files.forEach((file, i) => {
-        if (!file.type.startsWith("image/")) {
-          showToast(`⚠️ الملف ${file.name} غير مدعوم`, "error");
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const imgWidth = 210;
-            const imgHeight = (img.height * imgWidth) / img.width;
-            if (i > 0) pdf.addPage();
-            pdf.addImage(img, "JPEG", 0, 0, imgWidth, imgHeight);
-
-            count++;
-            const progress = Math.round((count / total) * 100);
-            bar.style.width = progress + "%";
-            progressText.textContent = `🔄 جاري التحويل... ${progress}%`;
-
-            if (count === total) {
-              const pdfName = `${subjects[index].name}.pdf`;
-              const pdfBlob = pdf.output("blob");
-              const pdfUrl = URL.createObjectURL(pdfBlob);
-              subjects[index].pdf = pdfUrl;
-              subjects[index].pdfName = pdfName;
-              subjects[index].imageOrder = files; // حفظ ترتيب الصور
-              saveSubjects();
-
-              setTimeout(() => {
-                bar.style.background = "#1ae37f";
-                progressText.textContent = `✅ تم إنشاء الملف (${pdfName}) بنجاح`;
-                bar.style.width = "100%";
-                openBtn.disabled = false;
-                downloadBtn.disabled = false;
-              }, 400);
-            }
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    window.openPDF = (index) => {
-      if (!subjects[index].pdf) return showToast("📌 لا يوجد ملف محفوظ", "error");
-      window.open(subjects[index].pdf, "_blank");
-    };
-
-    window.downloadPDF = (index) => {
-      if (!subjects[index].pdf) return showToast("📌 لا يوجد ملف محفوظ", "error");
-      const link = document.createElement("a");
-      link.href = subjects[index].pdf;
-      link.download = subjects[index].pdfName;
-      link.click();
-    };
-
-    function downloadAll() {
-      const zip = new JSZip();
-      let count = 0;
-      const total = subjects.filter(s => s.pdf).length;
-
-      if (total === 0) return showToast("📌 لا يوجد ملفات محفوظة للتحميل", "error");
-
-      subjects.forEach(subj => {
-        if (subj.pdf) {
-          fetch(subj.pdf).then(res => res.blob()).then(blob => {
-            zip.file(subj.pdfName, blob);
-            count++;
-            if (count === total) {
-              zip.generateAsync({ type: "blob" }).then(content => {
-                saveAs(content, "كل_الملفات.zip");
-                showToast("⬇️ تم تحميل كل الملفات بنجاح");
-              });
-            }
-          });
-        }
-      });
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-    }
-
-    renderSubjects();
-
-    window.addEventListener("beforeunload", function (e) {
-      e.preventDefault();
-      e.returnValue = "⚠️ أنت على وشك الخروج، هل أنت متأكد؟";
     });
-  </script>
-</body>
-</html>
+  });
+}
+
+async function convertToPDF(i){
+  const subj=subjects[i];
+  if(!subj.images.length){showToast("اختر صور أولاً","error"); return;}
+  const pdf=new jsPDF("p","mm","a4");
+  const progress
