@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -69,38 +68,21 @@ Designed & Developed by: Ahmed Hany Sayed Ahmed Abdel Wahab &copy; 2025
 const { jsPDF } = window.jspdf;
 let subjects = JSON.parse(localStorage.getItem("subjects")||"[]");
 
-// =======================================
-// دالة الإشعارات الجميلة
-function showToast(msg,type="info"){
-  let icon = "";
-  let bg = "#4f46e5";
-  if(type==="error"){ icon="⚠️ "; bg="#dc2626"; }
-  else if(type==="success"){ icon="✅ "; bg="#0e7653"; }
-  Toastify({
-    text: icon + msg,
-    duration:3000,
-    gravity:"top",
-    position:"center",
-    backgroundColor:bg,
-    stopOnFocus:true
-  }).showToast();
-}
-// =======================================
-
+function showToast(msg,type="info"){Toastify({text:msg,duration:3000,gravity:"top",position:"center",backgroundColor:type==="error"?"#dc2626":"#4f46e5"}).showToast();}
 function saveSubjects(){localStorage.setItem("subjects",JSON.stringify(subjects));}
 function toggleDarkMode(){document.body.classList.toggle("dark");}
 
 function addSubject(){
   const name=document.getElementById("subjectName").value.trim();
-  if(!name){showToast("اكتب اسم المادة","error");return;}
+  if(!name){showToast("⚠️ اكتب اسم المادة","error");return;}
   subjects.push({name,images:[],pdf:null});
   saveSubjects(); renderSubjects();
   document.getElementById("subjectName").value="";
-  showToast("تم إضافة المادة بنجاح","success");
+  showToast("✅ تم إضافة المادة");
 }
 
-function deleteSubject(i){if(confirm("هل أنت متأكد؟")){subjects.splice(i,1);saveSubjects();renderSubjects();showToast("تم الحذف","success");}}
-function editSubject(i){const n=prompt("اكتب الاسم الجديد:",subjects[i].name);if(n){subjects[i].name=n;saveSubjects();renderSubjects();showToast("تم تعديل الاسم","success");}}
+function deleteSubject(i){if(confirm("هل أنت متأكد؟")){subjects.splice(i,1);saveSubjects();renderSubjects();showToast("🗑️ تم الحذف");}}
+function editSubject(i){const n=prompt("اكتب الاسم الجديد:",subjects[i].name);if(n){subjects[i].name=n;saveSubjects();renderSubjects();showToast("✏️ تم تعديل الاسم");}}
 
 function renderSubjects(){
   const container=document.getElementById("subjects"); container.innerHTML="";
@@ -127,7 +109,6 @@ function renderSubjects(){
     const fileCount=document.getElementById(`fileCount-${i}`);
     subj.images=subj.images||[];
 
-    // عرض الصور الحالية
     preview.innerHTML=""; subj.images.forEach(im=>{const img=document.createElement("img");img.src=im.url;preview.appendChild(img);});
     new Sortable(preview,{animation:150,ghostClass:'dragging',onEnd:function(){const order=Array.from(preview.children).map(img=>subj.images.find(im=>im.url===img.src)); subj.images=order; saveSubjects();}});
 
@@ -143,6 +124,45 @@ function renderSubjects(){
 
 async function convertToPDF(i){
   const subj=subjects[i];
-  if(!subj.images.length){showToast("اختر صور أولاً","error"); return;}
+  if(!subj.images.length){showToast("📌 اختر صور أولاً","error"); return;}
   const pdf=new jsPDF("p","mm","a4");
-  const progress
+  const progress=document.getElementById(`progress-${i}`);
+  const bar=document.getElementById(`bar-${i}`);
+  bar.style.width="0%"; bar.style.background="#b6f4d9"; progress.textContent="⏳ جاري التحويل...";
+
+  for(let j=0;j<subj.images.length;j++){
+    await new Promise(resolve=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        const img=new Image();
+        img.onload=()=>{
+          const w=190,h=277; const ratio=Math.min(w/img.width,h/img.height,1);
+          const width=img.width*ratio,height=img.height*ratio;
+          const canvas=document.createElement("canvas"); canvas.width=width; canvas.height=height;
+          canvas.getContext("2d").drawImage(img,0,0,width,height);
+          const dataURL=canvas.toDataURL("image/jpeg",0.7);
+          if(j>0) pdf.addPage();
+          pdf.addImage(dataURL,"JPEG",(210-width)/2,(297-height)/2,width,height);
+          bar.style.width=Math.round(((j+1)/subj.images.length)*100)+"%";
+          progress.textContent=`🔄 جاري التحويل... ${Math.round(((j+1)/subj.images.length)*100)}%`;
+          resolve();
+        }; img.src=e.target.result;
+      }; reader.readAsDataURL(subj.images[j].file);
+    });
+  }
+
+  const blob=pdf.output("blob"); subj.pdf=URL.createObjectURL(blob); saveSubjects();
+  document.getElementById(`previewBtn-${i}`).disabled=false;
+  document.getElementById(`downloadBtn-${i}`).disabled=false;
+  bar.style.width="100%"; bar.style.background="#1ae37f";
+  progress.textContent=`✅ تم إنشاء PDF`;
+}
+
+function previewPDF(i){const subj=subjects[i]; if(subj.pdf) window.open(subj.pdf,"_blank");}
+function downloadPDF(i){const subj=subjects[i]; if(subj.pdf){const a=document.createElement("a");a.href=subj.pdf;a.download=`${subj.name}.pdf`;a.click();}}
+
+renderSubjects();
+</script>
+</body>
+</html>
+
