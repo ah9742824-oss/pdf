@@ -1,167 +1,331 @@
 
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>📚 مكتبتي التعليمية</title>
 <link rel="icon" href="favicon.ico" type="image/ico">
 
+<!-- مكتبات -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <style>
-body { font-family:"Cairo",sans-serif; margin:0; background:#f3f4f6; color:#333; direction:rtl; transition:.3s;}
-body.dark{background:#111827;color:#e5e7eb;}
-header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;padding:25px 20px;font-size:22px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
-.toggle-btn{background:white;color:#4f46e5;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;margin-top:5px;}
-body.dark .toggle-btn{background:#1f2937;color:#f3f4f6;}
-main{max-width:900px;margin:30px auto;padding:0 15px;}
-.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-input,button{padding:10px 15px;border-radius:8px;border:none;font-size:14px;}
-input{flex:1;border:1px solid #ddd;}
-button{cursor:pointer;background:#4f46e5;color:white;transition:.2s;}
-button:hover{background:#3730a3;}
-button:disabled{background:#ccc;cursor:not-allowed;}
-.subject-card{background:white;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:.3s;}
-body.dark .subject-card{background:#1f2937;color:#f9fafb;}
-.subject-card h3{margin:0 0 10px;}
-.actions{display:flex;gap:8px;flex-wrap:wrap;}
-.actions button{flex:1;min-width:120px;}
-.file-label{display:inline-block;padding:10px 15px;background:#6366f1;color:white;border-radius:8px;cursor:pointer;font-size:14px;transition:.2s;}
-.file-label:hover{background:#4f46e5;}
-input[type="file"]{display:none;}
-.download-all{margin:20px 0;text-align:center;}
-.progress-bar{height:8px;width:0%;background:#4f46e5;border-radius:4px;transition:width .3s;}
-.preview-container{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-.preview-container img{max-width:100px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);cursor:move;}
-.preview-container img.dragging{opacity:.5;}
-footer{text-align:center;padding:15px;color:#0e7653;font-family:Arial,sans-serif;font-size:14px;margin-top:50px;}
-.link-btn a{display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:white;padding:5px 5px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:bold;transition:.3s;}
-.link-btn a:hover{background:linear-gradient(135deg,#3730a3,#4f46e5);}
-@media(max-width:600px){.actions{flex-direction:column}.actions button{min-width:100%}.controls{flex-direction:column} input,button{width:100%}.preview-container img{max-width:80px}}
+  /* --- ستايل مُختصر ومريح --- */
+  body{font-family:"Cairo",sans-serif;margin:0;background:#f3f4f6;color:#333;direction:rtl;transition:.25s}
+  body.dark{background:#111827;color:#e5e7eb}
+  header{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .link-btn a{display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;padding:6px 10px;border-radius:8px;text-decoration:none}
+  .toggle-btn{background:#fff;color:#4f46e5;border:none;border-radius:8px;padding:6px 10px;cursor:pointer}
+  body.dark .toggle-btn{background:#1f2937;color:#f3f4f6}
+  main{max-width:900px;margin:28px auto;padding:0 16px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  input[type="text"],select,button{padding:10px 12px;border-radius:8px;border:1px solid #ddd;font-size:14px}
+  input[type="text"]{flex:1}
+  button.primary{background:#4f46e5;color:#fff;border:0;cursor:pointer}
+  button.danger{background:#dc2626;color:#fff;border:0;cursor:pointer}
+  .subject-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+  body.dark .subject-card{background:#1f2937;color:#f9fafb}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .file-label{display:inline-block;padding:8px 12px;background:#6366f1;color:#fff;border-radius:8px;cursor:pointer}
+  .preview-container{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .preview-container img{width:100px;height:100px;object-fit:cover;border-radius:8px;cursor:move}
+  .progress-bar{height:8px;width:0;background:#4f46e5;border-radius:6px;transition:width .25s}
+  footer{text-align:center;padding:18px;color:#0e7653;margin-top:30px}
+  @media(max-width:600px){.controls{flex-direction:column}input[type="text"],select,button{width:100%}}
 </style>
 </head>
 <body>
 <header>
-<span>📚 مكتبتي التعليمية</span>
-<div class="link-btn">
-  <a href="https://ah9742824-oss.github.io/my-project/" target="_blank" title="زيارة المشروع">🌐</a>
-</div>
-<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-weight:700;font-size:18px">📚 مكتبتي التعليمية</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="link-btn"><a href="https://ah9742824-oss.github.io/my-project/" target="_blank" title="زيارة المشروع">🌐</a></div>
+    <button class="toggle-btn" id="toggleDark">🌙/☀️</button>
+  </div>
 </header>
 
 <main>
-<div class="controls">
-<input type="text" id="subjectName" placeholder="اسم المادة...">
-<button onclick="addSubject()">➕ إضافة</button>
-</div>
-<div id="subjects"></div>
+  <div class="controls">
+    <input type="text" id="subjectName" placeholder="اسم المادة..." aria-label="subject name">
+    <select id="qualitySelect" title="اختيار جودة الصور">
+      <option value="1.0">🔝 جودة عالية</option>
+      <option value="0.8">✨ جودة متوسطة</option>
+      <option value="0.6">📄 جودة منخفضة (حجم صغير)</option>
+    </select>
+    <button id="addBtn" class="primary">➕ إضافة</button>
+  </div>
+
+  <div id="subjects"></div>
 </main>
 
 <footer>
-Designed & Developed by: Ahmed Hany Sayed Ahmed Abdel Wahab &copy; 2025
+  Designed & Developed by: Ahmed Hany Sayed Ahmed Abdel Wahab &copy; 2025
 </footer>
 
 <script>
-const { jsPDF } = window.jspdf;
-let subjects = JSON.parse(localStorage.getItem("subjects")||"[]");
+/* ======= إعداد متغيرات الحالة ======= */
+const subjectsKey = "my_library_subjects_v2";
+let subjects = []; // كل عنصر: { id, name, images:[{id,file,url}], pdf: blobUrl|null }
 
-function showToast(msg,type="info"){Toastify({text:msg,duration:3000,gravity:"top",position:"center",backgroundColor:type==="error"?"#dc2626":"#4f46e5"}).showToast();}
-function saveSubjects(){localStorage.setItem("subjects",JSON.stringify(subjects));}
-function toggleDarkMode(){document.body.classList.toggle("dark");}
-
-function addSubject(){
-  const name=document.getElementById("subjectName").value.trim();
-  if(!name){showToast("⚠️ اكتب اسم المادة","error");return;}
-  subjects.push({name,images:[],pdf:null});
-  saveSubjects(); renderSubjects();
-  document.getElementById("subjectName").value="";
-  showToast("✅ تم إضافة المادة");
+/* ======= مساعدة لتخزين واسترجاع ======= */
+function loadSubjects(){
+  try{
+    const raw = localStorage.getItem(subjectsKey);
+    if(raw) subjects = JSON.parse(raw);
+    else subjects = [];
+  }catch(e){ console.warn("loadSubjects error",e); subjects=[];}
+}
+function saveSubjects(){
+  // نحتفظ فقط بالبيانات البسيطة في localStorage (لا نخزن File أو blob URLs طويلة)
+  // لكن للحفاظ على تجربة المستخدم نخزن أسماء الصور ومسارات الـ blob URLs المؤقتة عندما تكون موجودة.
+  try{
+    const copy = subjects.map(s=>({
+      id:s.id,
+      name:s.name,
+      // images we keep only id and url (url may be blob:), but File objects are not serializable
+      images: s.images ? s.images.map(im => ({ id: im.id, url: im.url })) : [],
+      pdf: s.pdf || null
+    }));
+    localStorage.setItem(subjectsKey, JSON.stringify(copy));
+  }catch(e){ console.warn("saveSubjects",e); }
 }
 
-function deleteSubject(i){if(confirm("هل أنت متأكد؟")){subjects.splice(i,1);saveSubjects();renderSubjects();showToast("🗑️ تم الحذف");}}
-function editSubject(i){const n=prompt("اكتب الاسم الجديد:",subjects[i].name);if(n){subjects[i].name=n;saveSubjects();renderSubjects();showToast("✏️ تم تعديل الاسم");}}
+/* ======= Toaster ======= */
+function toast(msg, type="info"){
+  if(window.Toastify){
+    Toastify({text:msg,duration:2500,gravity:"top",position:"center",backgroundColor:type==="error"?"#dc2626":"#4f46e5"}).showToast();
+  } else {
+    alert(msg);
+  }
+}
 
+/* ======= DOM عناصر ======= */
+const subjectsContainer = document.getElementById("subjects");
+const addBtn = document.getElementById("addBtn");
+const subjectNameInput = document.getElementById("subjectName");
+const qualitySelect = document.getElementById("qualitySelect");
+const toggleDark = document.getElementById("toggleDark");
+
+/* ======= Dark Mode محفوظ ======= */
+if(localStorage.getItem("darkMode")==="true"){ document.body.classList.add("dark"); }
+toggleDark.addEventListener("click", ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+});
+
+/* ======= إنشاء ID فريد بسيط ======= */
+function uid(prefix="id"){ return prefix + "_" + Date.now().toString(36) + "_" + Math.floor(Math.random()*10000).toString(36); }
+
+/* ======= إضافة مادة ======= */
+function addSubjectFromInput(){
+  const name = subjectNameInput.value.trim();
+  if(name){
+    addSubject(name);
+    subjectNameInput.value = "";
+    subjectNameInput.focus();
+  } else {
+    // لو الحقل فاضي، نطلب اسم عبر prompt (تجربة بديلة)
+    const p = prompt("اكتب اسم المادة:");
+    if(p && p.trim()) addSubject(p.trim());
+  }
+}
+function addSubject(name){
+  const s = { id: uid("subj"), name, images: [], pdf: null };
+  subjects.push(s);
+  saveSubjects();
+  renderSubjects();
+  toast("✅ تم إضافة المادة");
+}
+
+/* زرار إضافة -- تأكدنا إنه يشتغل عبر addEventListener */
+addBtn.addEventListener("click", addSubjectFromInput);
+
+/* دعم الضغط Enter داخل حقل الاسم */
+subjectNameInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") addSubjectFromInput();
+});
+
+/* ======= تحميل البيانات عند بداية الصفحة ======= */
+loadSubjects();
+
+/* ======= دالة إعادة رسم الواجهة بالكامل ======= */
 function renderSubjects(){
-  const container=document.getElementById("subjects"); container.innerHTML="";
-  subjects.forEach((subj,i)=>{
-    const div=document.createElement("div"); div.className="subject-card";
-    div.innerHTML=`
-<h3>${subj.name}</h3>
-<label class="file-label" for="fileInput-${i}">📂 اختر صور</label>
-<input type="file" id="fileInput-${i}" multiple>
-<p id="fileCount-${i}" style="margin:8px 0;color:#666;font-size:14px;">${subj.images.length?"🖼️ عدد الصور: "+subj.images.length:"🖼️ لم يتم اختيار صور بعد"}</p>
-<div class="preview-container" id="preview-${i}"></div>
-<p id="progress-${i}" style="margin:8px 0;color:#555;font-size:14px;"></p>
-<div class="progress-bar" id="bar-${i}"></div>
-<div class="actions">
-<button id="convertBtn-${i}" onclick="convertToPDF(${i})">📄 إنشاء/تحديث PDF</button>
-<button id="previewBtn-${i}" onclick="previewPDF(${i})" ${!subj.pdf?'disabled':''}>👀 معاينة PDF</button>
-<button id="downloadBtn-${i}" onclick="downloadPDF(${i})" ${!subj.pdf?'disabled':''}>⬇️ تحميل PDF</button>
-<button onclick="editSubject(${i})">✏️ تعديل اسم</button>
-<button onclick="deleteSubject(${i})" style="background:#dc2626">🗑️ حذف</button>
-</div>`; container.appendChild(div);
+  subjectsContainer.innerHTML = "";
+  subjects.forEach((subj, idx) => {
+    const card = document.createElement("div");
+    card.className = "subject-card";
+    card.dataset.index = idx;
+    card.innerHTML = `
+      <h3>${escapeHtml(subj.name)}</h3>
+      <label class="file-label" for="fileInput-${subj.id}">📂 اختر صور</label>
+      <input type="file" id="fileInput-${subj.id}" style="display:none" multiple accept="image/*">
+      <p id="fileCount-${subj.id}" style="margin:8px 0;color:#666;font-size:14px;">${(subj.images && subj.images.length) ? "🖼️ عدد الصور: " + subj.images.length : "🖼️ لم يتم اختيار صور بعد"}</p>
+      <div class="preview-container" id="preview-${subj.id}"></div>
+      <p id="progress-${subj.id}" style="margin:8px 0;color:#555;font-size:14px;"></p>
+      <div class="progress-bar" id="bar-${subj.id}" style="margin-top:6px"></div>
+      <div class="actions">
+        <button class="primary" data-action="convert" data-idx="${idx}">📄 إنشاء/تحديث PDF</button>
+        <button data-action="preview" data-idx="${idx}" ${!subj.pdf ? "disabled" : ""}>👀 معاينة PDF</button>
+        <button data-action="download" data-idx="${idx}" ${!subj.pdf ? "disabled" : ""}>⬇️ تحميل PDF</button>
+        <button data-action="edit" data-idx="${idx}">✏️ تعديل اسم</button>
+        <button data-action="delete" data-idx="${idx}" class="danger">🗑️ حذف</button>
+      </div>
+    `;
+    subjectsContainer.appendChild(card);
 
-    const input=document.getElementById(`fileInput-${i}`);
-    const preview=document.getElementById(`preview-${i}`);
-    const fileCount=document.getElementById(`fileCount-${i}`);
-    subj.images=subj.images||[];
+    // ربط input الملفات
+    const fileInput = card.querySelector(`#fileInput-${subj.id}`);
+    const preview = card.querySelector(`#preview-${subj.id}`);
+    const fileCount = card.querySelector(`#fileCount-${subj.id}`);
 
-    preview.innerHTML=""; subj.images.forEach(im=>{const img=document.createElement("img");img.src=im.url;preview.appendChild(img);});
-    new Sortable(preview,{animation:150,ghostClass:'dragging',onEnd:function(){const order=Array.from(preview.children).map(img=>subj.images.find(im=>im.url===img.src)); subj.images=order; saveSubjects();}});
+    // عرض الصور الحالية (قد تكون مخزنة كـ urls فقط)
+    preview.innerHTML = "";
+    subj.images = subj.images || [];
+    subj.images.forEach(im=>{
+      const imgEl = document.createElement("img");
+      imgEl.src = im.url;
+      imgEl.dataset.id = im.id;
+      preview.appendChild(imgEl);
+    });
 
-    input.addEventListener("change",()=>{
-      const files=Array.from(input.files);
-      subj.images=files.map(f=>({file:f,url:URL.createObjectURL(f)}));
-      fileCount.textContent=files.length?"🖼️ عدد الصور: "+files.length:"🖼️ لم يتم اختيار صور بعد";
-      preview.innerHTML=""; subj.images.forEach(im=>{const img=document.createElement("img");img.src=im.url;preview.appendChild(img);});
+    // تفعيل السحب والترتيب بالـ Sortable
+    new Sortable(preview, {
+      animation: 150,
+      ghostClass: "dragging",
+      onEnd: function(){
+        const ids = Array.from(preview.children).map(el => el.dataset.id);
+        subj.images = ids.map(id => subj.images.find(im => String(im.id) === String(id))).filter(Boolean);
+        saveSubjects();
+      }
+    });
+
+    // عندما يختار المستخدم صور جديدة
+    fileInput.addEventListener("change", (e)=>{
+      const files = Array.from(e.target.files || []);
+      subj.images = files.map(f => ({ id: uid("img"), file: f, url: URL.createObjectURL(f) }));
+      fileCount.textContent = subj.images.length ? `🖼️ عدد الصور: ${subj.images.length}` : "🖼️ لم يتم اختيار صور بعد";
+      preview.innerHTML = "";
+      subj.images.forEach(im=>{
+        const imgEl = document.createElement("img");
+        imgEl.src = im.url;
+        imgEl.dataset.id = im.id;
+        preview.appendChild(imgEl);
+      });
       saveSubjects();
     });
   });
 }
 
-async function convertToPDF(i){
-  const subj=subjects[i];
-  if(!subj.images.length){showToast("📌 اختر صور أولاً","error"); return;}
-  const pdf=new jsPDF("p","mm","a4");
-  const progress=document.getElementById(`progress-${i}`);
-  const bar=document.getElementById(`bar-${i}`);
-  bar.style.width="0%"; bar.style.background="#b6f4d9"; progress.textContent="⏳ جاري التحويل...";
+/* ======= تفادي XSS بسيط ======= */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ======= تعامل مع أزرار الوظائف (تفويض الأحداث) ======= */
+subjectsContainer.addEventListener("click", (e)=>{
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const idx = parseInt(btn.dataset.idx);
+  if(isNaN(idx)) return;
+
+  if(action === "delete"){
+    if(confirm("هل أنت متأكد؟")){
+      subjects.splice(idx,1);
+      saveSubjects();
+      renderSubjects();
+      toast("🗑️ تم الحذف");
+    }
+  } else if(action === "edit"){
+    const newName = prompt("اكتب الاسم الجديد:", subjects[idx].name);
+    if(newName && newName.trim()){
+      subjects[idx].name = newName.trim();
+      saveSubjects();
+      renderSubjects();
+      toast("✏️ تم تعديل الاسم");
+    }
+  } else if(action === "preview"){
+    const s = subjects[idx];
+    if(s && s.pdf) window.open(s.pdf,"_blank");
+  } else if(action === "download"){
+    const s = subjects[idx];
+    if(s && s.pdf){
+      const a = document.createElement("a");
+      a.href = s.pdf; a.download = `${s.name || "document"}.pdf`;
+      a.click();
+    }
+  } else if(action === "convert"){
+    convertToPDF(idx);
+  }
+});
+
+/* ======= تحويل إلى PDF (بجودة من اختيار المستخدم) ======= */
+async function convertToPDF(index){
+  const subj = subjects[index];
+  if(!subj) return;
+  if(!subj.images || subj.images.length === 0){
+    toast("📌 اختر صور أولاً", "error");
+    return;
+  }
+  const quality = parseFloat(qualitySelect.value || "1.0");
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+  const progressEl = document.getElementById(`progress-${subj.id}`);
+  const barEl = document.getElementById(`bar-${subj.id}`);
+  barEl.style.width = "0%";
+  progressEl.textContent = "⏳ جاري التحويل...";
 
   for(let j=0;j<subj.images.length;j++){
-    await new Promise(resolve=>{
-      const reader=new FileReader();
-      reader.onload=e=>{
-        const img=new Image();
-        img.onload=()=>{
-          const w=190,h=277; const ratio=Math.min(w/img.width,h/img.height,1);
-          const width=img.width*ratio,height=img.height*ratio;
-          const canvas=document.createElement("canvas"); canvas.width=width; canvas.height=height;
-          canvas.getContext("2d").drawImage(img,0,0,width,height);
-          const dataURL=canvas.toDataURL("image/jpeg",0.7);
-          if(j>0) pdf.addPage();
-          pdf.addImage(dataURL,"JPEG",(210-width)/2,(297-height)/2,width,height);
-          bar.style.width=Math.round(((j+1)/subj.images.length)*100)+"%";
-          progress.textContent=`🔄 جاري التحويل... ${Math.round(((j+1)/subj.images.length)*100)}%`;
-          resolve();
-        }; img.src=e.target.result;
-      }; reader.readAsDataURL(subj.images[j].file);
+    await new Promise((resolve)=>{
+      const im = subj.images[j];
+      // إذا لدينا ملف (عند اختيار حديثاً) نقرأه من object URL
+      const image = new Image();
+      image.onload = ()=>{
+        // حساب أبعاد مناسبة لصفحة A4
+        const maxW = 210, maxH = 297;
+        const ratio = Math.min(maxW / image.width, maxH / image.height);
+        const w = image.width * ratio;
+        const h = image.height * ratio;
+
+        // نستخدم كانفاس بدقة الصورة الأصلية لضمان جودة أفضل
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+
+        const dataURL = canvas.toDataURL("image/jpeg", quality);
+
+        if(j>0) pdf.addPage();
+        pdf.addImage(dataURL, "JPEG", (210 - w)/2, (297 - h)/2, w, h);
+
+        barEl.style.width = Math.round(((j+1)/subj.images.length)*100) + "%";
+        progressEl.textContent = `🔄 جاري التحويل... ${Math.round(((j+1)/subj.images.length)*100)}%`;
+        resolve();
+      };
+      // image.src يمكن أن يكون blob URL أو أي url محفوظ
+      image.onerror = ()=>{ resolve(); };
+      image.src = im.url;
     });
   }
 
-  const blob=pdf.output("blob"); subj.pdf=URL.createObjectURL(blob); saveSubjects();
-  document.getElementById(`previewBtn-${i}`).disabled=false;
-  document.getElementById(`downloadBtn-${i}`).disabled=false;
-  bar.style.width="100%"; bar.style.background="#1ae37f";
-  progress.textContent=`✅ تم إنشاء PDF`;
+  const blob = pdf.output("blob");
+  // تنظيف blob URL سابق لو موجود
+  if(subj.pdf) URL.revokeObjectURL(subj.pdf);
+  subj.pdf = URL.createObjectURL(blob);
+  saveSubjects();
+  renderSubjects();
+  barEl.style.width = "100%";
+  progressEl.textContent = "✅ تم إنشاء PDF";
+  toast("✅ تم إنشاء PDF بجودة " + (quality===1? "عالية" : quality===0.8? "متوسطة" : "منخفضة"));
 }
 
-function previewPDF(i){const subj=subjects[i]; if(subj.pdf) window.open(subj.pdf,"_blank");}
-function downloadPDF(i){const subj=subjects[i]; if(subj.pdf){const a=document.createElement("a");a.href=subj.pdf;a.download=`${subj.name}.pdf`;a.click();}}
-
+/* ======= عند التحميل نرسم واجهة المستخدم ======= */
 renderSubjects();
+
 </script>
 </body>
 </html>
